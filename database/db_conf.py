@@ -1,69 +1,17 @@
-import models.all_models
-from typing import Optional, Any
+# Flake8: noqa
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy.future.engine import Engine
+from typing import Any
 
 
 Base = declarative_base()
 
-# __engine: Optional[Engine | None] = None
-
-
-# def create_engine(
-#     postgresql: bool = False,
-#     sqlserver: bool = False,
-#     user: Any = None,
-#     password: Any = None,
-#     host: Any = None,
-#     port: int | None = None,
-#     database: str | None = None
-# ) -> Engine | None:
-#     global __engine
-
-#     if not postgresql or sqlserver:
-#         db = 'db_rpg_sqlite'
-#         conn_str = f'sqlite:///{db}'
-#         __engine = sa.create_engine(url=conn_str, echo=True, connect_args={"check_same_thread": False})
-
-#     if postgresql:
-#         conn_str = f'postgresql://{user}:{password}@{host}:{port}/{database}'
-#         __engine = sa.create_engine(url=conn_str)
-
-#     if sqlserver:
-#         conn_str = f'mssql://{user}:{password}@{host}:{port}/{database}'
-#         __engine = sa.create_engine(url=conn_str)
-
-#     return __engine
-
-
-# def create_session() -> Session:
-#     global __engine
-
-#     if not __engine:
-#         create_engine()
-
-#     __session = sessionmaker(__engine, expire_on_commit=False, class_=Session)
-
-#     session: Session = __session()
-
-#     return session
-
-
-# def create_tables() -> None:
-#     global __engine
-
-#     if not __engine:
-#         create_engine()
-
-#     Base.metadata.drop_all(__engine)
-#     Base.metadata.create_all(__engine)
-
 
 class DataBase:
     def __init__(self):
-        self.__engine
-        self.__session
+        self.__engine = self.create_engine()
+        self.__session = self.create_session()
 
     def create_engine(
         self,
@@ -90,7 +38,7 @@ class DataBase:
             Engine | None: Ele retornarar a criação de DB SQLite por padrão, se não optar por Posgresql ou SqlServer.
         """
         if not postgresql and not sqlserver:
-            db = 'db_rpg_sqlite'
+            db = 'db_rpg.sqlite3'
             conn_str = f'sqlite:///{db}'
             self.__engine = sa.create_engine(
                 url=conn_str,
