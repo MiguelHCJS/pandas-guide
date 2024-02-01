@@ -1,3 +1,5 @@
+*Em construção*
+
 # Pandas Guide
 
 ## Funções e tratamentos úteis
