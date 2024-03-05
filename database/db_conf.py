@@ -1,19 +1,19 @@
 # Flake8: noqa
-import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
-from sqlalchemy.future.engine import Engine
+# import sqlalchemy as sa
+# from sqlalchemy.orm import sessionmaker, Session, declarative_base
+# from sqlalchemy.future.engine import Engine
 from typing import Any
+from sqlmodel import SQLModel, create_engine
 
 
-Base = declarative_base()
+# Base = declarative_base()
 
 
 class DataBase:
     def __init__(self):
-        self.__engine = self.create_engine()
-        self.__session = self.create_session()
+        self.__engine = self.createEngine()
 
-    def create_engine(
+    def createEngine(
         self,
         postgresql: bool = False,
         sqlserver: bool = False,
@@ -21,8 +21,8 @@ class DataBase:
         password: Any = None,
         host: Any = None,
         port: int | None = None,
-        database: str | None = None
-    ) -> Engine | None:
+        database: str | None = None,
+    ):
         """Criando Engine
 
         Args:
@@ -38,16 +38,18 @@ class DataBase:
             Engine | None: Ele retornarar a criação de DB SQLite por padrão, se não optar por Posgresql ou SqlServer.
         """
         if not postgresql and not sqlserver:
-            db = 'db_rpg.sqlite3'
+            db = 'db_rpg.db'
             conn_str = f'sqlite:///{db}'
-            self.__engine = sa.create_engine(
+            self.__engine = create_engine(
                 url=conn_str,
                 echo=True,
-                connect_args={"check_same_thread": False}
+                connect_args={'check_same_thread': False},
             )
 
         if postgresql:
-            conn_str = f'postgresql://{user}:{password}@{host}:{port}/{database}'
+            conn_str = (
+                f'postgresql://{user}:{password}@{host}:{port}/{database}'
+            )
             self.__engine = sa.create_engine(url=conn_str)
 
         if sqlserver:
@@ -56,23 +58,11 @@ class DataBase:
 
         return self.__engine
 
-    def create_session(self):
-        """Criando a Sessão vinculada a Engine
-
-        Returns:
-            Session: Estabelece a conexão
+    def create_tables(self) -> None:
+        """
+        Realiza a criação das tabelas no Banco de Dados
         """
         if not self.__engine:
-            self.create_engine()
+            self.createEngine()
 
-        self.__session = sessionmaker(self.__engine, expire_on_commit=False, class_=Session)
-
-        return self.__session
-
-    def create_tables(self) -> None:
-        """Realiza a criação das tabelas no Banco de Dados"""
-        if not self.__engine:
-            self.create_engine()
-
-        Base.metadata.drop_all(self.__engine)
-        Base.metadata.create_all(self.__engine)
+        SQLModel.metadata.create_all(self.__engine)

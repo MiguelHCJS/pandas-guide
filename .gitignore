@@ -164,3 +164,5 @@ cython_debug/
 
 # Scripts de treino
 *_teste.ipynb
+*.db
+projetos_da_hashtag/
